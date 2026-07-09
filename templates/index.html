@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartToll Bank & Vehicle Registry Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #080b11;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --primary-grad: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            --accent-grad: linear-gradient(135deg, #ff007f 0%, #7f00ff 100%);
+            --success-grad: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --font-main: 'Outfit', sans-serif;
+            --glow-color: rgba(0, 242, 254, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 242, 254, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(127, 0, 255, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #080b11;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        .container {
+            max-width: 1540px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-section i {
+            font-size: 2.2rem;
+            background: var(--primary-grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 8px var(--glow-color));
+        }
+
+        .logo-section h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-section span {
+            font-size: 0.9rem;
+            color: #00f2fe;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: block;
+            margin-top: -4px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #10b981;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 242, 254, 0.3);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-grad);
+        }
+
+        .metric-card.accent::before { background: var(--accent-grad); }
+        .metric-card.success::before { background: var(--success-grad); }
+        .metric-card.warning::before { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+
+        .metric-info h3 {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .metric-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .metric-card.primary .metric-icon i { color: #00f2fe; }
+        .metric-card.success .metric-icon i { color: #38ef7d; }
+        .metric-card.warning .metric-icon i { color: #f59e0b; }
+        .metric-card.accent .metric-icon i { color: #ff007f; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .glass-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 1.75rem;
+            backdrop-filter: blur(12px);
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .panel-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #ffffff;
+            border-left: 3px solid #00f2fe;
+            padding-left: 10px;
+        }
+
+        .panel-title-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-title i {
+            color: #00f2fe;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px 12px 10px 40px;
+            color: #ffffff;
+            font-family: var(--font-main);
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #00f2fe;
+            box-shadow: 0 0 8px rgba(0, 242, 254, 0.2);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        select.form-control {
+            padding-right: 24px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+
+        select.form-control option {
+            background-color: #080b11;
+            color: #fff;
+        }
+
+        .btn {
+            width: 100%;
+            background: var(--primary-grad);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            color: #000000;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: var(--font-main);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .btn:active { transform: translateY(0); }
+
+        .btn-secondary {
+            background: var(--accent-grad);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(255, 0, 127, 0.2);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(255, 0, 127, 0.4);
+        }
+
+        .terminal-display {
+            background: #06080d;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            margin-bottom: 1.25rem;
+            min-height: 130px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s ease;
+            border-top: 4px solid var(--text-secondary);
+        }
+
+        .terminal-display.idle { border-top-color: var(--text-secondary); }
+        .terminal-display.success {
+            border-top-color: #10b981;
+            background: rgba(16, 185, 129, 0.05);
+            box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.1);
+        }
+        .terminal-display.failed {
+            border-top-color: #ef4444;
+            background: rgba(239, 68, 68, 0.05);
+            box-shadow: inset 0 0 20px rgba(239, 68, 68, 0.1);
+        }
+
+        .terminal-status {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .terminal-display.success .terminal-status { color: #10b981; }
+        .terminal-display.failed .terminal-status { color: #ef4444; }
+
+        .terminal-msg {
+            font-size: 1.15rem;
+            font-weight: 500;
+            color: #ffffff;
+        }
+
+        .terminal-submsg {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(10, 15, 26, 0.4);
+            margin-bottom: 0.5rem;
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+
+        th {
+            background: rgba(15, 23, 42, 0.85);
+            padding: 12px 14px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: #e2e8f0;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255, 255, 255, 0.01); color: #ffffff; }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-motorcycle, .badge-bike { background: rgba(125, 211, 252, 0.1); color: #7dd3fc; border: 1px solid rgba(125, 211, 252, 0.2); }
+        .badge-car_jeep, .badge-car, .badge-sedan, .badge-suv { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); }
+        .badge-pickup, .badge-microbus, .badge-minibus { background: rgba(167, 139, 250, 0.1); color: #c084fc; border: 1px solid rgba(167, 139, 250, 0.2); }
+        .badge-medium_bus, .badge-large_bus, .badge-bus { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); }
+        .badge-small_truck, .badge-medium_truck_5_8t, .badge-medium_truck_8_11t, .badge-large_truck, .badge-truck { background: rgba(244, 63, 94, 0.1); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.2); }
+        .badge-trailer_4_axle, .badge-trailer_5_axle { background: rgba(249, 115, 22, 0.1); color: #fdba74; border: 1px solid rgba(249, 115, 22, 0.2); }
+
+        .badge-deposit { background: rgba(56, 239, 125, 0.1); color: #38ef7d; border: 1px solid rgba(56, 239, 125, 0.2); }
+        .badge-toll { background: rgba(0, 242, 254, 0.1); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.2); }
+        .badge-initial { background: rgba(167, 139, 250, 0.1); color: #c084fc; border: 1px solid rgba(167, 139, 250, 0.2); }
+
+        .balance-cell { font-family: monospace; font-weight: 600; color: #38ef7d; }
+        .tag-cell { font-family: monospace; background: rgba(255, 255, 255, 0.05); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; color: #00f2fe; }
+
+        .action-icon {
+            color: #00f2fe;
+            cursor: pointer;
+            transition: color 0.2s;
+            margin-right: 8px;
+        }
+        .action-icon:hover { color: #ffffff; }
+
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 380px;
+        }
+
+        .toast {
+            background: rgba(15, 23, 42, 0.95);
+            border-left: 4px solid #00f2fe;
+            padding: 16px;
+            border-radius: 8px;
+            color: #ffffff;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            animation: slideIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.success { border-left-color: #10b981; }
+        .toast.error { border-left-color: #ef4444; }
+
+        .toast-content { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
+        .toast-content i { font-size: 1.1rem; }
+        .toast.success i { color: #10b981; }
+        .toast.error i { color: #ef4444; }
+        .toast-close { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1rem; }
+        .toast-close:hover { color: #ffffff; }
+
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { transform: translateX(50%); opacity: 0; } }
+
+        .no-data { text-align: center; padding: 1.5rem; color: var(--text-secondary); font-style: italic; }
+
+        .rates-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .rate-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            font-size: 0.75rem;
+        }
+        .rate-box span { display: block; font-weight: 700; color: #00f2fe; margin-top: 2px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <header>
+            <div class="logo-section">
+                <i class="fa-solid fa-road-barrier"></i>
+                <div>
+                    <h1>SmartToll Ledger</h1>
+                    <span>Realistic Vehicle & Bank Integration</span>
+                </div>
+            </div>
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                <span>Server & Database Online</span>
+            </div>
+        </header>
+
+        <section class="metrics-grid">
+            <div class="metric-card primary">
+                <div class="metric-info">
+                    <h3>Bank Accounts</h3>
+                    <div class="metric-value" id="metric-accounts">0</div>
+                </div>
+                <div class="metric-icon"><i class="fa-solid fa-users"></i></div>
+            </div>
+            <div class="metric-card warning">
+                <div class="metric-info">
+                    <h3>Registered Vehicles</h3>
+                    <div class="metric-value" id="metric-vehicles">0</div>
+                </div>
+                <div class="metric-icon"><i class="fa-solid fa-car"></i></div>
+            </div>
+            <div class="metric-card success">
+                <div class="metric-info">
+                    <h3>Vault Balance</h3>
+                    <div class="metric-value" id="metric-vault">৳0.00</div>
+                </div>
+                <div class="metric-icon"><i class="fa-solid fa-vault"></i></div>
+            </div>
+            <div class="metric-card accent">
+                <div class="metric-info">
+                    <h3>Total Transactions</h3>
+                    <div class="metric-value" id="metric-transactions">0</div>
+                </div>
+                <div class="metric-icon"><i class="fa-solid fa-receipt"></i></div>
+            </div>
+        </section>
+
+        <main class="dashboard-grid">
+
+            <div class="grid-col-left">
+
+                <div class="glass-panel">
+                    <h2 class="panel-title">
+                        <span class="panel-title-text"><i class="fa-solid fa-wallet"></i> Create Bank Account</span>
+                    </h2>
+                    <form id="account-form">
+                        <div class="form-group">
+                            <label for="acc-name">Account Owner Name</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-user"></i>
+                                <input type="text" id="acc-name" class="form-control" placeholder="E.g. Tahmid Rahman" required autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="acc-balance">Initial Deposit (৳)</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-bangladeshi-taka-sign"></i>
+                                <input type="number" id="acc-balance" class="form-control" placeholder="0.00" min="0" step="0.01" value="100.00">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn"><i class="fa-solid fa-plus"></i> Open Account</button>
+                    </form>
+                </div>
+
+                <div class="glass-panel">
+                    <h2 class="panel-title">
+                        <span class="panel-title-text"><i class="fa-solid fa-car-side"></i> Register Vehicle</span>
+                    </h2>
+                    <form id="vehicle-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="veh-plate">Car License Plate</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-id-card"></i>
+                                    <input type="text" id="veh-plate" class="form-control" placeholder="DHAKA-METRO-KA-..." required autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="veh-type">Vehicle Type</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-truck-monster"></i>
+                                    <select id="veh-type" class="form-control" required>
+                                        <option value="MOTORCYCLE">Motorcycle</option>
+                                        <option value="CAR_JEEP">Car / Jeep</option>
+                                        <option value="PICKUP">Pickup</option>
+                                        <option value="MICROBUS">Microbus</option>
+                                        <option value="MINIBUS">Minibus (up to 31 seats)</option>
+                                        <option value="MEDIUM_BUS">Medium Bus (32+ seats)</option>
+                                        <option value="LARGE_BUS">Large Bus (3-axle)</option>
+                                        <option value="SMALL_TRUCK">Small Truck (up to 5 tons)</option>
+                                        <option value="MEDIUM_TRUCK_5_8T">Medium Truck (5 to 8 tons)</option>
+                                        <option value="MEDIUM_TRUCK_8_11T">Medium Truck (8 to 11 tons)</option>
+                                        <option value="LARGE_TRUCK">Large Truck (up to 3 axles)</option>
+                                        <option value="TRAILER_4_AXLE">Trailer (4 axles)</option>
+                                        <option value="TRAILER_5_AXLE">Trailer (over 4 axles)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="veh-rfid">RFID Tag ID (Optional)</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-microchip"></i>
+                                <input type="text" id="veh-rfid" class="form-control" placeholder="E.g. A1 B2 C3 D4" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="veh-account">Link to Bank Account</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-link"></i>
+                                <select id="veh-account" class="form-control" required>
+                                    <option value="" disabled selected>Select Account to Link</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-secondary"><i class="fa-solid fa-link"></i> Register & Link</button>
+                    </form>
+                </div>
+
+                <div class="glass-panel">
+                    <h2 class="panel-title">
+                        <span class="panel-title-text"><i class="fa-solid fa-money-bill-transfer"></i> Deposit Money</span>
+                    </h2>
+                    <form id="deposit-form">
+                        <div class="form-group">
+                            <label for="dep-identifier">Account Number or License Plate</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-search"></i>
+                                <input type="text" id="dep-identifier" class="form-control" placeholder="ACC-XXXX or License Plate" required list="accounts-datalist" autocomplete="off">
+                            </div>
+                            <div id="dep-account-info" style="margin-top: 8px; font-size: 0.8rem; display: none; line-height: 1.4;"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="dep-amount">Deposit Amount (৳)</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-bangladeshi-taka-sign"></i>
+                                <input type="number" id="dep-amount" class="form-control" placeholder="0.00" min="0.01" step="0.01" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn"><i class="fa-solid fa-circle-arrow-up"></i> Deposit Funds</button>
+                    </form>
+                </div>
+
+                <div class="glass-panel">
+                    <h2 class="panel-title">
+                        <span class="panel-title-text"><i class="fa-solid fa-road-barrier"></i> Simulated Toll plaza</span>
+                    </h2>
+
+                    <div class="terminal-display idle" id="terminal-screen">
+                        <div class="terminal-status" id="term-status-lbl">Terminal Online</div>
+                        <div class="terminal-msg" id="term-msg-lbl">Waiting for detection</div>
+                        <div class="terminal-submsg" id="term-sub-lbl">Scan vehicle tags/plates below</div>
+                    </div>
+
+                    <div id="ocr-monitor" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 12px; margin-bottom: 1.25rem; display: none; text-align: center;">
+                        <h4 style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px; letter-spacing: 1px;">
+                            <i class="fa-solid fa-camera"></i> Live Camera OCR Monitor
+                        </h4>
+                        <div style="width: 100%; max-height: 180px; overflow: hidden; border-radius: 8px; margin-bottom: 8px; background: #000; display: flex; align-items: center; justify-content: center;">
+                            <img id="ocr-monitor-img" src="" alt="OCR Scanned Plate" style="max-width: 100%; max-height: 180px; object-fit: contain;">
+                        </div>
+                        <div style="font-size: 0.8rem; color: #e2e8f0; line-height: 1.4;">
+                            Read Plate: <strong id="ocr-monitor-text" style="color: #00f2fe; font-family: monospace;"></strong><br>
+                            Status: <span id="ocr-monitor-status" class="badge"></span>
+                        </div>
+                    </div>
+
+                    <form id="toll-form">
+                        <div class="form-group">
+                            <label for="toll-identifier">Scan Target (Plate or RFID)</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-barcode"></i>
+                                <select id="toll-identifier" class="form-control" required>
+                                    <option value="" disabled selected>Select vehicle to simulate scan</option>
+                                </select>
+                            </div>
+                            <div id="toll-vehicle-info" style="margin-top: 8px; font-size: 0.8rem; display: none; line-height: 1.4;"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="toll-amount">Custom Fee (৳) <span style="font-size:0.75rem; color:var(--text-secondary);">(Optional)</span></label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-bangladeshi-taka-sign"></i>
+                                    <input type="number" id="toll-amount" class="form-control" placeholder="Auto (by Type)" min="0.01" step="0.01">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="toll-booth">Toll Booth</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <input type="text" id="toll-booth" class="form-control" value="Expressway Gate 3" required>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn" style="background: var(--accent-grad); color: #fff;"><i class="fa-solid fa-bolt"></i> Charge Toll (Simulate OCR/RFID Scan)</button>
+                    </form>
+
+                    <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px;">
+                        <h4 style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Current System Toll Rates:</h4>
+                        <div class="rates-grid">
+                            <div class="rate-box">Motorcycle <span>৳100</span></div>
+                            <div class="rate-box">Car / Jeep <span>৳750</span></div>
+                            <div class="rate-box">Pickup <span>৳1,200</span></div>
+                            <div class="rate-box">Microbus <span>৳1,300</span></div>
+                            <div class="rate-box">Minibus <span>৳1,400</span></div>
+                            <div class="rate-box">Med Bus <span>৳2,000</span></div>
+                            <div class="rate-box">Large Bus <span>৳2,400</span></div>
+                            <div class="rate-box">Sm Truck <span>৳1,600</span></div>
+                            <div class="rate-box">Med Truck (5-8t) <span>৳2,100</span></div>
+                            <div class="rate-box">Med Truck (8-11t) <span>৳2,800</span></div>
+                            <div class="rate-box">Lrg Truck <span>৳5,500</span></div>
+                            <div class="rate-box">Trailer (4a) <span>৳6,000</span></div>
+                            <div class="rate-box">Trailer (5a+) <span>৳7,500</span></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="grid-col-right">
+
+                <div class="glass-panel">
+                    <h2 class="panel-title">
+                        <span class="panel-title-text"><i class="fa-solid fa-bank"></i> Bank Accounts Database</span>
+                    </h2>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Acc Number</th>
+                                    <th>Account Holder</th>
+                                    <th>Balance</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="accounts-table-body">
+                                <tr><td colspan="4" class="no-data">Loading accounts...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="glass-panel">
+                    <h2 class="panel-title">
+                        <span class="panel-title-text"><i class="fa-solid fa-car"></i> Registered Vehicles</span>
+                    </h2>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>License Plate</th>
+                                    <th>RFID Tag ID</th>
+                                    <th>Type</th>
+                                    <th>Linked Account</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vehicles-table-body">
+                                <tr><td colspan="4" class="no-data">No vehicles registered yet.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="glass-panel">
+                    <h2 class="panel-title">
+                        <span class="panel-title-text"><i class="fa-solid fa-clock-rotate-left"></i> Transaction Ledger</span>
+                    </h2>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Car Reg</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Details / Booth</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-table-body">
+                                <tr><td colspan="5" class="no-data">No transactions recorded.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <datalist id="accounts-datalist"></datalist>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <div id="result-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center;">
+        <style>
+            @keyframes modalZoom {
+                from { transform: scale(0.85); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
+            }
+            .modal-content-panel {
+                width: 90%;
+                max-width: 440px;
+                background: rgba(15, 23, 42, 0.9);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                border-radius: 20px;
+                padding: 2.2rem 2rem;
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+                text-align: center;
+                backdrop-filter: blur(16px);
+                animation: modalZoom 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+        </style>
+        <div class="modal-content-panel">
+            <div id="modal-icon" style="font-size: 3.8rem; margin-bottom: 1rem; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));"></div>
+            <h2 id="modal-title" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.5px;"></h2>
+            <p id="modal-subtitle" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.4;"></p>
+
+            <div id="modal-details" style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 1.1rem; margin-bottom: 1.5rem; text-align: left; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.05); line-height: 1.5;">
+            </div>
+
+            <button onclick="closeModal()" class="btn" style="background: var(--primary-grad); color: #000; width: auto; min-width: 140px; margin: 0 auto; padding: 10px 24px; font-weight:700;">OK, Got it</button>
+        </div>
+    </div>
+
+    <script>
+
+        const accountsTableBody = document.getElementById('accounts-table-body');
+        const vehiclesTableBody = document.getElementById('vehicles-table-body');
+        const transactionsTableBody = document.getElementById('transactions-table-body');
+
+        const vehAccountDropdown = document.getElementById('veh-account');
+        const tollIdentifierDropdown = document.getElementById('toll-identifier');
+        const accountsDatalist = document.getElementById('accounts-datalist');
+
+        const depIdentifierInput = document.getElementById('dep-identifier');
+        const depAccountInfo = document.getElementById('dep-account-info');
+        const tollVehicleInfo = document.getElementById('toll-vehicle-info');
+
+        const ocrMonitor = document.getElementById('ocr-monitor');
+        const ocrMonitorImg = document.getElementById('ocr-monitor-img');
+        const ocrMonitorText = document.getElementById('ocr-monitor-text');
+        const ocrMonitorStatus = document.getElementById('ocr-monitor-status');
+
+        const JS_TOLL_RATES = {
+            "MOTORCYCLE": 100.00,
+            "BIKE": 100.00,
+            "CAR_JEEP": 750.00,
+            "CAR": 750.00,
+            "SEDAN": 750.00,
+            "SUV": 750.00,
+            "PICKUP": 1200.00,
+            "MICROBUS": 1300.00,
+            "MINIBUS": 1400.00,
+            "MEDIUM_BUS": 2000.00,
+            "LARGE_BUS": 2400.00,
+            "BUS": 2400.00,
+            "SMALL_TRUCK": 1600.00,
+            "MEDIUM_TRUCK_5_8T": 2100.00,
+            "MEDIUM_TRUCK_8_11T": 2800.00,
+            "LARGE_TRUCK": 5500.00,
+            "TRUCK": 5500.00,
+            "TRAILER_4_AXLE": 6000.00,
+            "TRAILER_5_AXLE": 7500.00
+        };
+        function getTollRate(type) {
+            return JS_TOLL_RATES[type] || 0.00;
+        }
+
+        const metricAccounts = document.getElementById('metric-accounts');
+        const metricVehicles = document.getElementById('metric-vehicles');
+        const metricVault = document.getElementById('metric-vault');
+        const metricTransactions = document.getElementById('metric-transactions');
+
+        const accountForm = document.getElementById('account-form');
+        const vehicleForm = document.getElementById('vehicle-form');
+        const depositForm = document.getElementById('deposit-form');
+        const tollForm = document.getElementById('toll-form');
+
+        const terminalScreen = document.getElementById('terminal-screen');
+        const termStatusLbl = document.getElementById('term-status-lbl');
+        const termMsgLbl = document.getElementById('term-msg-lbl');
+        const termSubLbl = document.getElementById('term-sub-lbl');
+
+        let accountsList = [];
+        let vehiclesList = [];
+
+        async function refreshDashboard() {
+            await fetchAccounts();
+            await fetchVehicles();
+            await fetchTransactions();
+            await fetchLatestScan();
+        }
+
+        async function fetchLatestScan() {
+            try {
+                const res = await fetch('/api/latest-scan');
+                if (!res.ok) throw new Error("Failed to load latest scan.");
+                const data = await res.json();
+
+                if (data.image_url) {
+                    ocrMonitorImg.src = data.image_url;
+                    ocrMonitorText.textContent = data.detected_text;
+
+                    ocrMonitorStatus.textContent = data.status;
+                    ocrMonitorStatus.className = 'badge';
+                    if (data.status === 'SUCCESS') {
+                        ocrMonitorStatus.classList.add('badge-deposit');
+                    } else {
+                        ocrMonitorStatus.classList.add('badge-truck');
+                    }
+
+                    ocrMonitor.style.display = 'block';
+                } else {
+                    ocrMonitor.style.display = 'none';
+                }
+            } catch (err) {
+                console.error("Error fetching latest scan:", err);
+            }
+        }
+
+        depIdentifierInput.addEventListener('input', () => {
+            const val = depIdentifierInput.value.trim().toUpperCase();
+            if (!val) {
+                depAccountInfo.style.display = 'none';
+                return;
+            }
+
+            let acc = accountsList.find(a => a.account_number.toUpperCase() === val);
+
+            if (!acc) {
+                const veh = vehiclesList.find(v => v.car_reg.toUpperCase() === val || (v.rfid_tag && v.rfid_tag.toUpperCase() === val));
+                if (veh) {
+                    acc = accountsList.find(a => a.account_number === veh.account_number);
+                }
+            }
+
+            if (acc) {
+                depAccountInfo.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#38ef7d; margin-right:4px;"></i> Account Found: <strong>${acc.owner_name}</strong> | Balance: <strong style="color:#38ef7d;">৳${acc.balance.toFixed(2)}</strong>`;
+                depAccountInfo.style.color = '#e2e8f0';
+                depAccountInfo.style.display = 'block';
+            } else {
+                depAccountInfo.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:#f87171; margin-right:4px;"></i> No matching account or vehicle plate found.`;
+                depAccountInfo.style.color = '#94a3b8';
+                depAccountInfo.style.display = 'block';
+            }
+        });
+
+        tollIdentifierDropdown.addEventListener('change', () => {
+            const val = tollIdentifierDropdown.value.trim().toUpperCase();
+            if (!val) {
+                tollVehicleInfo.style.display = 'none';
+                return;
+            }
+
+            const veh = vehiclesList.find(v => v.car_reg.toUpperCase() === val || (v.rfid_tag && v.rfid_tag.toUpperCase() === val));
+            if (veh) {
+                const acc = accountsList.find(a => a.account_number === veh.account_number);
+                const rate = getTollRate(veh.vehicle_type);
+                tollVehicleInfo.innerHTML = `<i class="fa-solid fa-circle-info" style="color:#00f2fe; margin-right:4px;"></i> Type: <strong>${veh.vehicle_type}</strong> | Toll Rate: <strong style="color:#00f2fe;">৳${rate.toFixed(2)}</strong><br><i class="fa-solid fa-wallet" style="color:#38ef7d; margin-right:4px;"></i> Account: <strong>${veh.account_number}</strong> | Balance: <strong style="color:#38ef7d;">৳${acc ? acc.balance.toFixed(2) : '0.00'}</strong>`;
+                tollVehicleInfo.style.color = '#e2e8f0';
+                tollVehicleInfo.style.display = 'block';
+            } else {
+                tollVehicleInfo.style.display = 'none';
+            }
+        });
+
+        function showResultModal(title, subtitle, detailsHtml, isSuccess = true) {
+            const modal = document.getElementById('result-modal');
+            const icon = document.getElementById('modal-icon');
+            const titleEl = document.getElementById('modal-title');
+            const subtitleEl = document.getElementById('modal-subtitle');
+            const detailsEl = document.getElementById('modal-details');
+
+            if (isSuccess) {
+                icon.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #38ef7d;"></i>`;
+                titleEl.style.color = '#38ef7d';
+            } else {
+                icon.innerHTML = `<i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i>`;
+                titleEl.style.color = '#ef4444';
+            }
+
+            titleEl.textContent = title;
+            subtitleEl.textContent = subtitle;
+            detailsEl.innerHTML = detailsHtml;
+
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('result-modal').style.display = 'none';
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
+
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="fa-solid ${icon}"></i>
+                    <span>${message}</span>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 4500);
+        }
+
+        async function fetchAccounts() {
+            try {
+                const res = await fetch('/api/accounts');
+                if (!res.ok) throw new Error("Failed to load accounts.");
+                accountsList = await res.json();
+
+                renderAccounts(accountsList);
+                updateAccountDropdown(accountsList);
+                updateDatalist(accountsList);
+                updateVaultAndAccountsMetrics();
+            } catch (err) {
+                console.error(err);
+                accountsTableBody.innerHTML = `<tr><td colspan="4" class="no-data" style="color:#ef4444;">Error loading accounts.</td></tr>`;
+            }
+        }
+
+        async function fetchVehicles() {
+            try {
+                const res = await fetch('/api/vehicles');
+                if (!res.ok) throw new Error("Failed to load vehicles.");
+                vehiclesList = await res.json();
+
+                renderVehicles(vehiclesList);
+                updateTollDropdown(vehiclesList);
+                metricVehicles.textContent = vehiclesList.length;
+            } catch (err) {
+                console.error(err);
+                vehiclesTableBody.innerHTML = `<tr><td colspan="4" class="no-data" style="color:#ef4444;">Error loading vehicles.</td></tr>`;
+            }
+        }
+
+        async function fetchTransactions() {
+            try {
+                const res = await fetch('/api/transactions');
+                if (!res.ok) throw new Error("Failed to load transactions.");
+                const txs = await res.json();
+
+                renderTransactions(txs);
+                metricTransactions.textContent = txs.length;
+            } catch (err) {
+                console.error(err);
+                transactionsTableBody.innerHTML = `<tr><td colspan="5" class="no-data" style="color:#ef4444;">Error loading transactions.</td></tr>`;
+            }
+        }
+
+        function renderAccounts(accounts) {
+            if (accounts.length === 0) {
+                accountsTableBody.innerHTML = `<tr><td colspan="4" class="no-data">No accounts registered yet.</td></tr>`;
+                return;
+            }
+            accountsTableBody.innerHTML = accounts.map(acc => `
+                <tr>
+                    <td style="font-weight: 600; color: #00f2fe;">${acc.account_number}</td>
+                    <td>${acc.owner_name}</td>
+                    <td><span class="balance-cell">৳${acc.balance.toFixed(2)}</span></td>
+                    <td>
+                        <i class="fa-solid fa-money-bill-transfer action-icon" title="Deposit to Account" onclick="fillDepositForm('${acc.account_number}')"></i>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderVehicles(vehicles) {
+            if (vehicles.length === 0) {
+                vehiclesTableBody.innerHTML = `<tr><td colspan="4" class="no-data">No vehicles registered yet.</td></tr>`;
+                return;
+            }
+            vehiclesTableBody.innerHTML = vehicles.map(v => {
+                const rfid = v.rfid_tag ? `<span class="tag-cell">${v.rfid_tag}</span>` : '<span style="color:#475569; font-style:italic;">None</span>';
+                let badgeClass = `badge-${v.vehicle_type.toLowerCase()}`;
+
+                return `
+                    <tr>
+                        <td style="font-weight:600;">${v.car_reg}</td>
+                        <td>${rfid}</td>
+                        <td><span class="badge ${badgeClass}">${v.vehicle_type}</span></td>
+                        <td>
+                            <div style="font-size:0.8rem; font-weight:600;">${v.account_number}</div>
+                            <div style="font-size:0.75rem; color:var(--text-secondary);">${v.owner_name}</div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderTransactions(txs) {
+            if (txs.length === 0) {
+                transactionsTableBody.innerHTML = `<tr><td colspan="5" class="no-data">No transactions recorded yet.</td></tr>`;
+                return;
+            }
+            transactionsTableBody.innerHTML = txs.map(tx => {
+                let badgeClass = 'badge-deposit';
+                let typeText = tx.type;
+                if (tx.type === 'TOLL_PAYMENT') {
+                    badgeClass = 'badge-toll';
+                    typeText = 'Toll Pay';
+                } else if (tx.type === 'DEPOSIT' && tx.toll_booth === 'INITIAL DEPOSIT') {
+                    badgeClass = 'badge-initial';
+                    typeText = 'Initial';
+                }
+
+                const date = new Date(tx.timestamp);
+                const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const dateStr = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+
+                return `
+                    <tr>
+                        <td style="font-size:0.75rem; color:var(--text-secondary);">${dateStr} ${timeStr}</td>
+                        <td style="font-weight:600;">${tx.car_reg || 'N/A'}</td>
+                        <td><span class="badge ${badgeClass}">${typeText}</span></td>
+                        <td style="font-weight:600; ${tx.type === 'TOLL_PAYMENT' ? 'color:#f87171;' : 'color:#38ef7d;'}">
+                            ${tx.type === 'TOLL_PAYMENT' ? '-' : '+'}৳${tx.amount.toFixed(2)}
+                        </td>
+                        <td style="font-size:0.8rem; color:var(--text-secondary);">${tx.toll_booth || ''}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateAccountDropdown(accounts) {
+            const currentSelected = vehAccountDropdown.value;
+            vehAccountDropdown.innerHTML = `<option value="" disabled selected>Select Account to Link</option>` +
+                accounts.map(acc => `<option value="${acc.id}">${acc.account_number} - ${acc.owner_name}</option>`).join('');
+            if (currentSelected) {
+                vehAccountDropdown.value = currentSelected;
+            }
+        }
+
+        function updateTollDropdown(vehicles) {
+            const currentSelected = tollIdentifierDropdown.value;
+            tollIdentifierDropdown.innerHTML = `<option value="" disabled selected>Select vehicle to simulate scan</option>` +
+                vehicles.map(v => `<option value="${v.rfid_tag || v.car_reg}">${v.car_reg} (${v.vehicle_type} - ${v.rfid_tag ? 'RFID: ' + v.rfid_tag : 'No RFID'})</option>`).join('');
+            if (currentSelected) {
+                tollIdentifierDropdown.value = currentSelected;
+            }
+        }
+
+        function updateDatalist(accounts) {
+            let options = accounts.map(acc => `<option value="${acc.account_number}">Owner: ${acc.owner_name}</option>`).join('');
+
+            vehiclesList.forEach(v => {
+                options += `<option value="${v.car_reg}">Linked to Account: ${v.account_number} (${v.owner_name})</option>`;
+            });
+            accountsDatalist.innerHTML = options;
+        }
+
+        function updateVaultAndAccountsMetrics() {
+            metricAccounts.textContent = accountsList.length;
+            const vaultSum = accountsList.reduce((sum, acc) => sum + acc.balance, 0);
+            metricVault.textContent = `৳${vaultSum.toFixed(2)}`;
+        }
+
+        function fillDepositForm(accNum) {
+            document.getElementById('dep-identifier').value = accNum;
+            document.getElementById('dep-amount').focus();
+        }
+
+        accountForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const owner_name = document.getElementById('acc-name').value;
+            const initial_balance = document.getElementById('acc-balance').value;
+
+            try {
+                const res = await fetch('/api/accounts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ owner_name, initial_balance })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Failed to create account.");
+
+                showToast(`Opened Account ${data.account_number} for ${data.owner_name}!`);
+                accountForm.reset();
+                document.getElementById('acc-balance').value = "100.00";
+
+                await refreshDashboard();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        });
+
+        vehicleForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const car_reg = document.getElementById('veh-plate').value;
+            const vehicle_type = document.getElementById('veh-type').value;
+            const rfid_tag = document.getElementById('veh-rfid').value;
+            const bank_account_id = document.getElementById('veh-account').value;
+
+            try {
+                const res = await fetch('/api/vehicles', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ car_reg, vehicle_type, rfid_tag, bank_account_id })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Failed to register vehicle.");
+
+                showToast(`Vehicle ${data.car_reg} (${data.vehicle_type}) registered!`);
+                vehicleForm.reset();
+
+                await refreshDashboard();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        });
+
+        depositForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const identifier = document.getElementById('dep-identifier').value;
+            const amount = document.getElementById('dep-amount').value;
+
+            try {
+                const res = await fetch('/api/deposit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ identifier, amount })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Failed to deposit.");
+
+                const detailsHtml = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                        <span style="color:var(--text-secondary);">Account Number:</span>
+                        <strong style="color:#00f2fe;">${data.account_number}</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                        <span style="color:var(--text-secondary);">Deposited Amount:</span>
+                        <strong style="color:#38ef7d;">৳${parseFloat(amount).toFixed(2)}</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.05); padding-top:6px;">
+                        <span style="color:var(--text-secondary);">New Balance:</span>
+                        <strong style="color:#38ef7d; font-size:1rem;">৳${data.new_balance.toFixed(2)}</strong>
+                    </div>
+                `;
+                showResultModal(
+                    "Deposit Successful",
+                    "Funds have been successfully credited.",
+                    detailsHtml,
+                    true
+                );
+
+                depositForm.reset();
+                depAccountInfo.style.display = 'none';
+
+                await refreshDashboard();
+            } catch (err) {
+                showResultModal(
+                    "Deposit Failed",
+                    "Transaction could not be completed.",
+                    `<div style="color:#ef4444; font-weight:500;"><i class="fa-solid fa-triangle-exclamation"></i> Error: ${err.message}</div>`,
+                    false
+                );
+            }
+        });
+
+        tollForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const identifier = tollIdentifierDropdown.value;
+            const customAmount = document.getElementById('toll-amount').value;
+            const toll_booth = document.getElementById('toll-booth').value;
+
+            terminalScreen.className = 'terminal-display idle';
+            termStatusLbl.textContent = 'OCR/RFID Scanning...';
+            termMsgLbl.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Reading Identifier`;
+            termSubLbl.textContent = 'Communicating with local registry...';
+
+            setTimeout(async () => {
+                try {
+                    const bodyPayload = { identifier, toll_booth };
+                    if (customAmount) {
+                        bodyPayload.amount = parseFloat(customAmount);
+                    }
+
+                    const res = await fetch('/api/toll-pay', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(bodyPayload)
+                    });
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                        terminalScreen.className = 'terminal-display failed';
+                        termStatusLbl.textContent = data.status || 'DECLINED';
+                        termMsgLbl.textContent = `Toll Charge Aborted`;
+                        termSubLbl.textContent = data.error || 'Access Denied';
+
+                        showResultModal(
+                            "Toll Charge Declined",
+                            data.error || "Access Denied",
+                            `<div style="color:#ef4444; font-weight:500;"><i class="fa-solid fa-ban"></i> Reason: ${data.error || 'Toll deduction failed'}</div>`,
+                            false
+                        );
+                    } else {
+                        terminalScreen.className = 'terminal-display success';
+                        termStatusLbl.textContent = 'ACCESS GRANTED';
+                        termMsgLbl.innerHTML = `Charged: <strong style="color: #38ef7d;">৳${data.deducted_amount.toFixed(2)}</strong>`;
+                        termSubLbl.textContent = `Car: ${data.car_reg} (${data.vehicle_type}) | Account Balance: ৳${data.new_balance.toFixed(2)}`;
+
+                        const detailsHtml = `
+                            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                                <span style="color:var(--text-secondary);">Vehicle Plate:</span>
+                                <strong>${data.car_reg}</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                                <span style="color:var(--text-secondary);">Vehicle Type:</span>
+                                <span class="badge badge-${data.vehicle_type.toLowerCase()}">${data.vehicle_type}</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                                <span style="color:var(--text-secondary);">Toll Plaza:</span>
+                                <strong>${data.toll_booth}</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:6px; border-top:1px solid rgba(255,255,255,0.05); padding-top:6px;">
+                                <span style="color:var(--text-secondary);">Toll Fee:</span>
+                                <strong style="color:#f87171;">-৳${data.deducted_amount.toFixed(2)}</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between;">
+                                <span style="color:var(--text-secondary);">Remaining Balance:</span>
+                                <strong style="color:#38ef7d; font-size:1rem;">৳${data.new_balance.toFixed(2)}</strong>
+                            </div>
+                        `;
+                        showResultModal(
+                            "Toll Paid - Access Granted",
+                            "Toll fee has been successfully charged to the linked account.",
+                            detailsHtml,
+                            true
+                        );
+
+                        tollForm.reset();
+                        document.getElementById('toll-booth').value = "Expressway Gate 3";
+                        tollVehicleInfo.style.display = 'none';
+
+                        await refreshDashboard();
+                    }
+                } catch (err) {
+                    terminalScreen.className = 'terminal-display failed';
+                    termStatusLbl.textContent = 'CONNECTION FAILED';
+                    termMsgLbl.textContent = `Bank API Offline`;
+                    termSubLbl.textContent = err.message;
+
+                    showResultModal(
+                        "Connection Failed",
+                        "Could not connect to the local bank API.",
+                        `<div style="color:#ef4444; font-weight:500;"><i class="fa-solid fa-triangle-exclamation"></i> Error: ${err.message}</div>`,
+                        false
+                    );
+                }
+            }, 600);
+        });
+
+        window.addEventListener('DOMContentLoaded', refreshDashboard);
+
+        setInterval(refreshDashboard, 5000);
+    </script>
+</body>
+</html>
