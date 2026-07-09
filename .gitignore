@@ -1,7 +1,16 @@
+# SQLite Database files
 *.db
+Toll_Web_Application/*.db
+
+# Python cache files
 __pycache__/
 *.pyc
+Toll_Web_Application/__pycache__/
+
+# Local system files
 .DS_Store
 Thumbs.db
-static/uploads/*
-!static/uploads/.gitkeep
+
+# User uploaded media
+Toll_Web_Application/static/uploads/*
+!Toll_Web_Application/static/uploads/.gitkeep
